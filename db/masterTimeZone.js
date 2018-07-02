@@ -6,8 +6,13 @@ const ObjectId = require('mongodb')
 const masterTimeZoneSchema = require("./masterTimeZoneSchema");
 
 // Creates a masterTimeZoneCollection collection in the database
-var masterTimeZoneCollection = mongoose.model("masterTimeZoneCollection", masterTimeZoneSchema);
 
+
+
+var masterTimeZoneCollection = mongoose.model("masterTimeZoneCollection", masterTimeZoneSchema);
+module.exports.masterTimeZone = {
+  masterTimeZoneSchema
+};
 // Saves the masterTimeZoneCollection object to the database and returns a Promise
 // The assumption here is that the Object is valid
 module.exports.save = (object) => {
