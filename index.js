@@ -4,32 +4,37 @@ const masterTimeZoneSchema = require("./model/masterTimeZoneSchema")
 const masterTimeZoneCollection = require("./db/masterTimeZone");
 const validate = require("jsonschema")
   .validate;
-const docketClient=require("evolvus-docket-client");
+const docketClient = require("evolvus-docket-client");
+const masterTimeZoneDBSchema = require('./db/masterTimeZoneSchema');
 
-var docketObject={
+var docketObject = {
   // required fields
-  application:"PLATFORM",
-  source:"masterTimeZone",
-  name:"",
-  createdBy:"",
-  ipAddress:"",
-  status:"SUCCESS", //by default
-  eventDateTime:Date.now(),
-  keyDataAsJSON:"",
-  details:"",
+  application: "PLATFORM",
+  source: "masterTimeZone",
+  name: "",
+  createdBy: "",
+  ipAddress: "",
+  status: "SUCCESS", //by default
+  eventDateTime: Date.now(),
+  keyDataAsJSON: "",
+  details: "",
   //non required fields
-  level:""
+  level: ""
 };
 
+module.exports.user = {
+  masterTimeZoneSchema,
+  masterTimeZoneDBSchema
+};
 module.exports.validate = (masterTimeZoneObject) => {
   return new Promise((resolve, reject) => {
     try {
-      if(typeof masterTimeZoneObject==="undefined" ) {
+      if (typeof masterTimeZoneObject === "undefined") {
         throw new Error("IllegalArgumentException:masterTimeZoneObject is undefined");
       }
       var res = validate(masterTimeZoneObject, masterTimeZoneSchema);
       debug("validation status: ", JSON.stringify(res));
-      if(res.valid) {
+      if (res.valid) {
         resolve(res.valid);
       } else {
         reject(res.errors);
@@ -45,16 +50,16 @@ module.exports.validate = (masterTimeZoneObject) => {
 module.exports.save = (masterTimeZoneObject) => {
   return new Promise((resolve, reject) => {
     try {
-      if(typeof masterTimeZoneObject === 'undefined' || masterTimeZoneObject == null) {
-         throw new Error("IllegalArgumentException: masterTimeZoneObject is null or undefined");
+      if (typeof masterTimeZoneObject === 'undefined' || masterTimeZoneObject == null) {
+        throw new Error("IllegalArgumentException: masterTimeZoneObject is null or undefined");
       }
-      docketObject.name="masterTimeZone_save";
-      docketObject.keyDataAsJSON=JSON.stringify(masterTimeZoneObject);
-      docketObject.details=`masterTimeZone creation initiated`;
+      docketObject.name = "masterTimeZone_save";
+      docketObject.keyDataAsJSON = JSON.stringify(masterTimeZoneObject);
+      docketObject.details = `masterTimeZone creation initiated`;
       docketClient.postToDocket(docketObject);
       var res = validate(masterTimeZoneObject, masterTimeZoneSchema);
       debug("validation status: ", JSON.stringify(res));
-      if(!res.valid) {
+      if (!res.valid) {
         reject(res.errors);
       }
 
@@ -70,9 +75,9 @@ module.exports.save = (masterTimeZoneObject) => {
         reject(e);
       });
     } catch (e) {
-      docketObject.name="masterTimeZone_ExceptionOnSave";
-      docketObject.keyDataAsJSON=JSON.stringify(masterTimeZoneObject);
-      docketObject.details=`caught Exception on masterTimeZone_save ${e.message}`;
+      docketObject.name = "masterTimeZone_ExceptionOnSave";
+      docketObject.keyDataAsJSON = JSON.stringify(masterTimeZoneObject);
+      docketObject.details = `caught Exception on masterTimeZone_save ${e.message}`;
       docketClient.postToDocket(docketObject);
       debug(`caught exception ${e}`);
       reject(e);
@@ -89,9 +94,9 @@ module.exports.getAll = (limit) => {
       if (typeof(limit) == "undefined" || limit == null) {
         throw new Error("IllegalArgumentException: limit is null or undefined");
       }
-      docketObject.name="masterTimeZone_getAll";
-      docketObject.keyDataAsJSON=`getAll with limit ${limit}`;
-      docketObject.details=`masterTimeZone getAll method`;
+      docketObject.name = "masterTimeZone_getAll";
+      docketObject.keyDataAsJSON = `getAll with limit ${limit}`;
+      docketObject.details = `masterTimeZone getAll method`;
       docketClient.postToDocket(docketObject);
 
       masterTimeZoneCollection.findAll(limit).then((docs) => {
@@ -102,9 +107,9 @@ module.exports.getAll = (limit) => {
         reject(e);
       });
     } catch (e) {
-      docketObject.name="masterTimeZone_ExceptionOngetAll";
-      docketObject.keyDataAsJSON="masterTimeZoneObject";
-      docketObject.details=`caught Exception on masterTimeZone_getAll ${e.message}`;
+      docketObject.name = "masterTimeZone_ExceptionOngetAll";
+      docketObject.keyDataAsJSON = "masterTimeZoneObject";
+      docketObject.details = `caught Exception on masterTimeZone_getAll ${e.message}`;
       docketClient.postToDocket(docketObject);
       debug(`caught exception ${e}`);
       reject(e);
@@ -121,9 +126,9 @@ module.exports.getById = (id) => {
       if (typeof(id) == "undefined" || id == null) {
         throw new Error("IllegalArgumentException: id is null or undefined");
       }
-      docketObject.name="masterTimeZone_getById";
-      docketObject.keyDataAsJSON=`masterTimeZoneObject id is ${id}`;
-      docketObject.details=`masterTimeZone getById initiated`;
+      docketObject.name = "masterTimeZone_getById";
+      docketObject.keyDataAsJSON = `masterTimeZoneObject id is ${id}`;
+      docketObject.details = `masterTimeZone getById initiated`;
       docketClient.postToDocket(docketObject);
 
       masterTimeZoneCollection.findById(id)
@@ -142,9 +147,9 @@ module.exports.getById = (id) => {
         });
 
     } catch (e) {
-      docketObject.name="masterTimeZone_ExceptionOngetById";
-      docketObject.keyDataAsJSON=`masterTimeZoneObject id is ${id}`;
-      docketObject.details=`caught Exception on masterTimeZone_getById ${e.message}`;
+      docketObject.name = "masterTimeZone_ExceptionOngetById";
+      docketObject.keyDataAsJSON = `masterTimeZoneObject id is ${id}`;
+      docketObject.details = `caught Exception on masterTimeZone_getById ${e.message}`;
       docketClient.postToDocket(docketObject);
       debug(`caught exception ${e}`);
       reject(e);
@@ -152,18 +157,18 @@ module.exports.getById = (id) => {
   });
 };
 
-module.exports.getOne=(attribute,value)=> {
-  return new Promise((resolve,reject)=> {
+module.exports.getOne = (attribute, value) => {
+  return new Promise((resolve, reject) => {
     try {
       if (attribute == null || value == null || typeof attribute === 'undefined' || typeof value === 'undefined') {
         throw new Error("IllegalArgumentException: attribute/value is null or undefined");
       }
 
-      docketObject.name="masterTimeZone_getOne";
-      docketObject.keyDataAsJSON=`masterTimeZoneObject ${attribute} with value ${value}`;
-      docketObject.details=`masterTimeZone getOne initiated`;
+      docketObject.name = "masterTimeZone_getOne";
+      docketObject.keyDataAsJSON = `masterTimeZoneObject ${attribute} with value ${value}`;
+      docketObject.details = `masterTimeZone getOne initiated`;
       docketClient.postToDocket(docketObject);
-      masterTimeZoneCollection.findOne(attribute,value).then((data)=> {
+      masterTimeZoneCollection.findOne(attribute, value).then((data) => {
         if (data) {
           debug(`masterTimeZone found ${data}`);
           resolve(data);
@@ -172,13 +177,13 @@ module.exports.getOne=(attribute,value)=> {
           debug(`no masterTimeZone found by this ${attribute} ${value}`);
           resolve({});
         }
-      }).catch((e)=> {
+      }).catch((e) => {
         debug(`failed to find ${e}`);
       });
     } catch (e) {
-      docketObject.name="masterTimeZone_ExceptionOngetOne";
-      docketObject.keyDataAsJSON=`masterTimeZoneObject ${attribute} with value ${value}`;
-      docketObject.details=`caught Exception on masterTimeZone_getOne ${e.message}`;
+      docketObject.name = "masterTimeZone_ExceptionOngetOne";
+      docketObject.keyDataAsJSON = `masterTimeZoneObject ${attribute} with value ${value}`;
+      docketObject.details = `caught Exception on masterTimeZone_getOne ${e.message}`;
       docketClient.postToDocket(docketObject);
       debug(`caught exception ${e}`);
       reject(e);
@@ -186,18 +191,18 @@ module.exports.getOne=(attribute,value)=> {
   });
 };
 
-module.exports.getMany=(attribute,value)=> {
-  return new Promise((resolve,reject)=> {
+module.exports.getMany = (attribute, value) => {
+  return new Promise((resolve, reject) => {
     try {
       if (attribute == null || value == null || typeof attribute === 'undefined' || typeof value === 'undefined') {
         throw new Error("IllegalArgumentException: attribute/value is null or undefined");
       }
 
-      docketObject.name="masterTimeZone_getMany";
-      docketObject.keyDataAsJSON=`masterTimeZoneObject ${attribute} with value ${value}`;
-      docketObject.details=`masterTimeZone getMany initiated`;
+      docketObject.name = "masterTimeZone_getMany";
+      docketObject.keyDataAsJSON = `masterTimeZoneObject ${attribute} with value ${value}`;
+      docketObject.details = `masterTimeZone getMany initiated`;
       docketClient.postToDocket(docketObject);
-      masterTimeZoneCollection.findMany(attribute,value).then((data)=> {
+      masterTimeZoneCollection.findMany(attribute, value).then((data) => {
         if (data) {
           debug(`masterTimeZone found ${data}`);
           resolve(data);
@@ -206,13 +211,13 @@ module.exports.getMany=(attribute,value)=> {
           debug(`no masterTimeZone found by this ${attribute} ${value}`);
           resolve([]);
         }
-      }).catch((e)=> {
+      }).catch((e) => {
         debug(`failed to find ${e}`);
       });
     } catch (e) {
-      docketObject.name="masterTimeZone_ExceptionOngetMany";
-      docketObject.keyDataAsJSON=`masterTimeZoneObject ${attribute} with value ${value}`;
-      docketObject.details=`caught Exception on masterTimeZone_getMany ${e.message}`;
+      docketObject.name = "masterTimeZone_ExceptionOngetMany";
+      docketObject.keyDataAsJSON = `masterTimeZoneObject ${attribute} with value ${value}`;
+      docketObject.details = `caught Exception on masterTimeZone_getMany ${e.message}`;
       docketClient.postToDocket(docketObject);
       debug(`caught exception ${e}`);
       reject(e);
